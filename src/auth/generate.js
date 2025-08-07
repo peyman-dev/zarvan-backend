@@ -9,6 +9,7 @@ export default async function generateToken(parameter, expireAt) {
     },
     securityCode,
     {
+      expiresIn: expireAt,
       algorithm: "HS256",
     }
   );

@@ -19,12 +19,17 @@ const register = async (req, res) => {
 
     const hashedPassword = await hashPassword(validatedData.password);
 
-    console.log(hashedPassword);
-
-    const securedAccount = {
+    let securedAccount = {
       ...validatedData,
       password: hashedPassword,
     };
+    const users = await UserModel.find();
+
+    if (!users?.length) securedAccount = {
+        ...validatedData,
+        password: hashedPassword,
+        role: "ADMIN"
+      };
 
     const newAccount = await UserModel.create(securedAccount);
 
