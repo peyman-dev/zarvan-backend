@@ -4,7 +4,7 @@ import generateToken from "../auth/generate.js";
 import { hashPassword } from "../auth/password.js";
 import UserModel from "../models/UserModel.js";
 
-// Actions
+// Register
 const register = async (req, res) => {
   const payload = req.body;
   try {
@@ -41,7 +41,10 @@ const register = async (req, res) => {
       .send({
         message: "ثبت نام با موفقیت انجام گردید",
         ok: true,
-        data: newAccount,
+        data: {
+            ...newAccount,
+            accessToken,
+        },
       })
       .status(201);
   } catch (error) {
@@ -53,6 +56,10 @@ const register = async (req, res) => {
     });
   }
 };
+
+const login = async (req,res) => {
+
+}
 
 const userController = {
   register,
