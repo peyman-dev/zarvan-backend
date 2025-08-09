@@ -87,7 +87,11 @@ const login = async (req, res) => {
         ok: false
     })
 
-    res.send(data);
+    res.send({
+      message: "شما باموفقیت وارد حساب خود شدید !",
+      ok: true,
+      data: isUserExist
+    }).status(200);
   } catch (error) {
     const isDataSchemaError = error?.issues?.length;
     res.send({
