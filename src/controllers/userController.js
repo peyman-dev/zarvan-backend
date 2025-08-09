@@ -1,7 +1,7 @@
 import * as v from "valibot";
 import RegisterSchema from "../validations/user/register.js";
-import generateToken from "../auth/token.js";
-import { decryptPassword, hashPassword } from "../auth/password.js";
+import generateToken, { verifyToken } from "../core/auth/token.js";
+import { decryptPassword, hashPassword } from "../core/auth/password.js";
 import UserModel from "../models/UserModel.js";
 import LoginSchema from "../validations/user/login.js";
 
@@ -75,23 +75,30 @@ const login = async (req, res) => {
       ],
     });
 
-    if (!isUserExist) res.status(403).send({
+    if (!isUserExist)
+      res.status(403).send({
         message: "کاربری با این مشخصات یافت نشد !",
         ok: false,
-    });
+      });
 
-    const isPasswordValid = await decryptPassword(isUserExist.password, data.password)
+    const isPasswordValid = await decryptPassword(
+      isUserExist.password,
+      data.password
+    );
 
-    if (!isPasswordValid) res.status(403).send({
+    if (!isPasswordValid)
+      res.status(403).send({
         message: "اطلاعات وارد شده نامعتبر می‌باشد.",
-        ok: false
-    })
+        ok: false,
+      });
 
-    res.send({
-      message: "شما باموفقیت وارد حساب خود شدید !",
-      ok: true,
-      data: isUserExist
-    }).status(200);
+    res
+      .send({
+        message: "شما باموفقیت وارد حساب خود شدید !",
+        ok: true,
+        data: isUserExist,
+      })
+      .status(200);
   } catch (error) {
     const isDataSchemaError = error?.issues?.length;
     res.send({
@@ -103,9 +110,31 @@ const login = async (req, res) => {
   }
 };
 
+const getMe = async (req, res) => {
+  const token = req.headers["authorization"].split(" ")[1];
+  const data = await verifyToken(token);
+
+  const { phoneNumber } = data;
+  if (phoneNumber) {
+    const existenUser = await UserModel.findOne({
+      phoneNumber,
+    });
+
+    res.send({
+      ok: true,
+      data: existenUser,
+    });
+  } else {
+    res.send({
+      message: "لطفا دوباره وارد حساب خود بشید."
+    })
+  }
+};
+
 const userController = {
   register,
   login,
+  getMe,
 };
 
 export default userController;
