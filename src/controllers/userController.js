@@ -4,6 +4,7 @@ import generateToken, { verifyToken } from "../core/auth/token.js";
 import { decryptPassword, hashPassword } from "../core/auth/password.js";
 import UserModel from "../models/UserModel.js";
 import LoginSchema from "../validations/user/login.js";
+import { getFinalError } from "../core/settings.js";
 
 // Register
 const register = async (req, res) => {
@@ -100,12 +101,9 @@ const login = async (req, res) => {
       })
       .status(200);
   } catch (error) {
-    const isDataSchemaError = error?.issues?.length;
     res.send({
       ok: false,
-      message: isDataSchemaError
-        ? error?.issues?.map((issue) => issue.message)
-        : new Error(error),
+      message: getFinalError(error)
     });
   }
 };
