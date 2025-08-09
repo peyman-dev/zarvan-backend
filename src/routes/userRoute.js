@@ -5,5 +5,6 @@ const userRouter = e.Router();
 
 userRouter.post('/register', userController.register)
 userRouter.post('/login', userController.login)
+userRouter.get('/me', userController.getMe)
 
 export default userRouter;
